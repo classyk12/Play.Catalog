@@ -1,0 +1,27 @@
+# Binaries and build artifacts
+bin/
+debug/
+obj/
+*.dll
+*.exe
+*.o
+
+# IDE files
+.vscode/
+.vs/
+*.user
+*.sln.docstates
+.idea/
+
+# Dependencies
+packages/
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+.env
+.env.local
