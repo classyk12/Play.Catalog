@@ -1,3 +1,4 @@
+using Play.Catalog.Service.Entities;
 using Play.Catalog.Service.Repositories;
 
 namespace Play.Catalog.Service.Endpoints;
@@ -10,17 +11,17 @@ public static class ItemEndpoints
         .WithOpenApi()
         .WithTags("Items");
 
-        itemGroup.MapGet("/", async (IItemsRepository repository) => Results.Ok(await repository.GetItemsAsync()))
+        itemGroup.MapGet("/", async (IRepository<Item> repository) => Results.Ok(await repository.GetItemsAsync()))
            .WithName("GetItemsAsync");
 
-        itemGroup.MapGet("{id:guid}", async (Guid id, IItemsRepository repository) =>
+        itemGroup.MapGet("{id:guid}", async (Guid id, IRepository<Item> repository) =>
         {
             var item = await repository.GetItemAsync(id);
             return item is not null ? Results.Ok(item) : Results.NotFound();
         })
         .WithName("GetItemByIdAsync");
 
-        itemGroup.MapPost("/", async (CreateItemDto dto, IItemsRepository repository) =>
+        itemGroup.MapPost("/", async (CreateItemDto dto, IRepository<Item> repository) =>
         {
             var errors = ModelValidator.ValidateDto(dto);
             if (errors.Count > 0)
@@ -32,7 +33,7 @@ public static class ItemEndpoints
         })
         .WithName("CreateItemAsync");
 
-        itemGroup.MapPut("/{id:guid}", async (Guid id, UpdateItemDto dto, IItemsRepository repository) =>
+        itemGroup.MapPut("/{id:guid}", async (Guid id, UpdateItemDto dto, IRepository<Item> repository) =>
         {
             var errors = ModelValidator.ValidateDto(dto);
             if (errors.Count > 0)
@@ -52,7 +53,7 @@ public static class ItemEndpoints
         })
         .WithName("UpdateItemAsync");
 
-        itemGroup.MapDelete("/{id:guid}", async (Guid id, IItemsRepository repository) =>
+        itemGroup.MapDelete("/{id:guid}", async (Guid id, IRepository<Item> repository) =>
         {
             var existingItem = await repository.GetItemAsync(id);
             if (existingItem is null)
