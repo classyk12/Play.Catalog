@@ -1,5 +1,5 @@
+using Common;
 using Play.Catalog.Service.Entities;
-using Play.Catalog.Service.Repositories;
 
 namespace Play.Catalog.Service.Endpoints;
 
@@ -11,12 +11,12 @@ public static class ItemEndpoints
         .WithOpenApi()
         .WithTags("Items");
 
-        itemGroup.MapGet("/", async (IRepository<Item> repository) => Results.Ok(await repository.GetItemsAsync()))
+        itemGroup.MapGet("/", async (IRepository<Item> repository) => Results.Ok(await repository.GetAllAsync()))
            .WithName("GetItemsAsync");
 
         itemGroup.MapGet("{id:guid}", async (Guid id, IRepository<Item> repository) =>
         {
-            var item = await repository.GetItemAsync(id);
+            var item = await repository.GetAsync(id);
             return item is not null ? Results.Ok(item) : Results.NotFound();
         })
         .WithName("GetItemByIdAsync");
@@ -28,7 +28,7 @@ public static class ItemEndpoints
                 return Results.BadRequest(errors);
 
             var item = new ItemDto(Guid.NewGuid(), dto.Name, dto.Description, dto.Price, DateTimeOffset.UtcNow);
-            await repository.CreateItemAsync(item.AsEntity());
+            await repository.CreateAsync(item.AsEntity());
             return Results.Created($"/items/{item.Id}", item);
         })
         .WithName("CreateItemAsync");
@@ -41,27 +41,27 @@ public static class ItemEndpoints
                 return Results.BadRequest(errors);
             }
 
-            var existingItem = await repository.GetItemAsync(id);
+            var existingItem = await repository.GetAsync(id);
             if (existingItem is null)
             {
                 return Results.NotFound();
             }
 
             var updatedItem = new ItemDto(id, dto.Name, dto.Description, dto.Price, existingItem.CreatedDate);
-            await repository.UpdateItemAsync(updatedItem.AsEntity());
+            await repository.UpdateAsync(updatedItem.AsEntity());
             return Results.NoContent();
         })
         .WithName("UpdateItemAsync");
 
         itemGroup.MapDelete("/{id:guid}", async (Guid id, IRepository<Item> repository) =>
         {
-            var existingItem = await repository.GetItemAsync(id);
+            var existingItem = await repository.GetAsync(id);
             if (existingItem is null)
             {
                 return Results.NotFound();
             }
 
-            await repository.DeleteItemAsync(id);
+            await repository.RemoveAsync(id);
             return Results.NoContent();
         })
         .WithName("DeleteItemAsync");
