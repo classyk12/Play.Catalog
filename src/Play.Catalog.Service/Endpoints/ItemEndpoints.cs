@@ -1,5 +1,6 @@
-using Common;
+
 using Play.Catalog.Service.Entities;
+using Play.Common;
 
 namespace Play.Catalog.Service.Endpoints;
 
@@ -61,7 +62,7 @@ public static class ItemEndpoints
                 return Results.NotFound();
             }
 
-            await repository.RemoveAsync(id);
+            await repository.DeleteAsync(id);
             return Results.NoContent();
         })
         .WithName("DeleteItemAsync");

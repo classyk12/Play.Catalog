@@ -1,6 +1,7 @@
-using Common;
-using Common.MongoDb;
+
 using Play.Catalog.Service.Endpoints;
+using Play.Common;
+using Play.Common.MongoDb;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMongo();
+builder.Services.AddMongoServices();
 
 // register the open-generic repository; MongoRepository<T> now computes its own collection name
 builder.Services.AddSingleton(typeof(IRepository<>), typeof(MongoRepository<>));
