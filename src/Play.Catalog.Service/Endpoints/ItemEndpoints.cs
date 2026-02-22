@@ -6,19 +6,37 @@ namespace Play.Catalog.Service.Endpoints;
 
 public static class ItemEndpoints
 {
+    private static int RequestCount = 0;
     public static WebApplication MapItemEndpoints(this WebApplication app)
     {
         var itemGroup = app.MapGroup("/api/items")
         .WithOpenApi()
         .WithTags("Items");
 
-        itemGroup.MapGet("/", async (IRepository<Item> repository) => Results.Ok(await repository.GetAllAsync()))
-           .WithName("GetItemsAsync");
+        itemGroup.MapGet("/", async (IRepository<Item> repository) =>
+        {
+            RequestCount++;
+            if (RequestCount <= 2)
+            {
+                Console.WriteLine($"Simulating transient failure for request #{RequestCount}");
+                await Task.Delay(TimeSpan.FromSeconds(10)); // Simulate some processing delay
+            }
+
+            if (RequestCount <= 4)
+            {
+                Console.WriteLine($"Internal server error for request #{RequestCount}");
+                return Results.StatusCode(500); // Simulate internal server error
+            }
+
+            Console.WriteLine($"Successful response for request #{RequestCount}");
+            return Results.Ok((await repository.GetAllAsync()).Select(item => item.AsDto()));
+        })
+        .WithName("GetItemsAsync");
 
         itemGroup.MapGet("{id:guid}", async (Guid id, IRepository<Item> repository) =>
         {
             var item = await repository.GetAsync(id);
-            return item is not null ? Results.Ok(item) : Results.NotFound();
+            return item is not null ? Results.Ok(item.AsDto()) : Results.NotFound();
         })
         .WithName("GetItemByIdAsync");
 
