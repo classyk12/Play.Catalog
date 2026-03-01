@@ -1,4 +1,6 @@
 
+using MassTransit;
+using Play.Catalog.Service;
 using Play.Catalog.Service.Endpoints;
 using Play.Common;
 using Play.Common.MongoDb;
@@ -10,6 +12,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMongoServices();
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitSettings = builder.Configuration.GetSection(nameof(RabbitMqSettings)).Get<RabbitMqSettings>();
+        var prefix = builder.Configuration.GetSection("ServiceSettings:ServiceName").Value;
+        cfg.Host(rabbitSettings!.Host!);
+        cfg.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter(prefix: prefix));
+    });
+});
 
 // register the open-generic repository; MongoRepository<T> now computes its own collection name
 builder.Services.AddSingleton(typeof(IRepository<>), typeof(MongoRepository<>));
@@ -28,7 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Map minimal API endpoints (Item endpoints)
-app.MapItemEndpoints();
+app.MapItemEndpoints(app.Services.GetRequiredService<IPublishEndpoint>());
 
 app.UseHttpsRedirection();
 

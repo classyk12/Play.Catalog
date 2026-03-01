@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Play.Catalog.Service", "src\Play.Catalog.Service\Play.Catalog.Service.csproj", "{686BA93F-3C49-B3D3-96D3-21A9D1D81D60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Play.Catalog.Contract", "Play.Catalog.Contract\Play.Catalog.Contract.csproj", "{C35BEE62-405A-48DB-9EAD-DB6137AFF90D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,12 +18,17 @@ Global
 		{686BA93F-3C49-B3D3-96D3-21A9D1D81D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{686BA93F-3C49-B3D3-96D3-21A9D1D81D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{686BA93F-3C49-B3D3-96D3-21A9D1D81D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C35BEE62-405A-48DB-9EAD-DB6137AFF90D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C35BEE62-405A-48DB-9EAD-DB6137AFF90D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C35BEE62-405A-48DB-9EAD-DB6137AFF90D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C35BEE62-405A-48DB-9EAD-DB6137AFF90D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{686BA93F-3C49-B3D3-96D3-21A9D1D81D60} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{C35BEE62-405A-48DB-9EAD-DB6137AFF90D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B9D07222-D13A-478F-8AAB-17B8A5263803}

@@ -1,13 +1,14 @@
 
+using MassTransit;
 using Play.Catalog.Service.Entities;
 using Play.Common;
+using static Play.Catalog.Contract.Contracts;
 
 namespace Play.Catalog.Service.Endpoints;
 
 public static class ItemEndpoints
 {
-    private static int RequestCount = 0;
-    public static WebApplication MapItemEndpoints(this WebApplication app)
+    public static WebApplication MapItemEndpoints(this WebApplication app, IPublishEndpoint publishEndpoint)
     {
         var itemGroup = app.MapGroup("/api/items")
         .WithOpenApi()
@@ -15,20 +16,6 @@ public static class ItemEndpoints
 
         itemGroup.MapGet("/", async (IRepository<Item> repository) =>
         {
-            RequestCount++;
-            if (RequestCount <= 2)
-            {
-                Console.WriteLine($"Simulating transient failure for request #{RequestCount}");
-                await Task.Delay(TimeSpan.FromSeconds(10)); // Simulate some processing delay
-            }
-
-            if (RequestCount <= 4)
-            {
-                Console.WriteLine($"Internal server error for request #{RequestCount}");
-                return Results.StatusCode(500); // Simulate internal server error
-            }
-
-            Console.WriteLine($"Successful response for request #{RequestCount}");
             return Results.Ok((await repository.GetAllAsync()).Select(item => item.AsDto()));
         })
         .WithName("GetItemsAsync");
@@ -48,6 +35,7 @@ public static class ItemEndpoints
 
             var item = new ItemDto(Guid.NewGuid(), dto.Name, dto.Description, dto.Price, DateTimeOffset.UtcNow);
             await repository.CreateAsync(item.AsEntity());
+            await publishEndpoint.Publish(new CatalogItemCreated(item.Id, item.Name, item.Description));
             return Results.Created($"/items/{item.Id}", item);
         })
         .WithName("CreateItemAsync");
@@ -68,6 +56,7 @@ public static class ItemEndpoints
 
             var updatedItem = new ItemDto(id, dto.Name, dto.Description, dto.Price, existingItem.CreatedDate);
             await repository.UpdateAsync(updatedItem.AsEntity());
+            await publishEndpoint.Publish(new CatalogItemUpdated(updatedItem.Id, updatedItem.Name, updatedItem.Description));
             return Results.NoContent();
         })
         .WithName("UpdateItemAsync");
@@ -81,6 +70,7 @@ public static class ItemEndpoints
             }
 
             await repository.DeleteAsync(id);
+            await publishEndpoint.Publish(new CatalogItemDeleted(id));
             return Results.NoContent();
         })
         .WithName("DeleteItemAsync");
