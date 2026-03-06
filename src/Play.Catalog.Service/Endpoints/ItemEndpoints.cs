@@ -8,7 +8,7 @@ namespace Play.Catalog.Service.Endpoints;
 
 public static class ItemEndpoints
 {
-    public static WebApplication MapItemEndpoints(this WebApplication app, IPublishEndpoint publishEndpoint)
+    public static WebApplication MapItemEndpoints(this WebApplication app)
     {
         var itemGroup = app.MapGroup("/api/items")
         .WithOpenApi()
@@ -27,7 +27,7 @@ public static class ItemEndpoints
         })
         .WithName("GetItemByIdAsync");
 
-        itemGroup.MapPost("/", async (CreateItemDto dto, IRepository<Item> repository) =>
+        itemGroup.MapPost("/", async (CreateItemDto dto, IRepository<Item> repository, IPublishEndpoint publishEndpoint) =>
         {
             var errors = ModelValidator.ValidateDto(dto);
             if (errors.Count > 0)
@@ -40,7 +40,7 @@ public static class ItemEndpoints
         })
         .WithName("CreateItemAsync");
 
-        itemGroup.MapPut("/{id:guid}", async (Guid id, UpdateItemDto dto, IRepository<Item> repository) =>
+        itemGroup.MapPut("/{id:guid}", async (Guid id, UpdateItemDto dto, IRepository<Item> repository, IPublishEndpoint publishEndpoint) =>
         {
             var errors = ModelValidator.ValidateDto(dto);
             if (errors.Count > 0)
@@ -61,7 +61,7 @@ public static class ItemEndpoints
         })
         .WithName("UpdateItemAsync");
 
-        itemGroup.MapDelete("/{id:guid}", async (Guid id, IRepository<Item> repository) =>
+        itemGroup.MapDelete("/{id:guid}", async (Guid id, IRepository<Item> repository, IPublishEndpoint publishEndpoint) =>
         {
             var existingItem = await repository.GetAsync(id);
             if (existingItem is null)
